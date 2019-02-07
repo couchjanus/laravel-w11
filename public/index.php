@@ -23,6 +23,7 @@ define('LARAVEL_START', microtime(true));
 // $user = new \App\User();
 require __DIR__.'/../vendor/autoload.php';
 $user = new \App\User();
+// dump($users);
 /*
 |--------------------------------------------------------------------------
 | Turn On The Lights

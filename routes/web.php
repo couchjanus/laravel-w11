@@ -15,49 +15,50 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/hello', function() {
-   return 'Hello World';
+Route::get('test', function () {
+
+    $sampleArray = ['one', 'two', 'three'];
+    dump($sampleArray);
+    return 'Test Dump Server';
 });
 
-Route::match(['get', 'post'], '/foobar', function () {
-    return 'Hello FooBar!';
-});
+Route::get('test-dd', function () {
+    $sampleArray = ['one', 'two', 'three'];
+    Debugbar::info($sampleArray);
+    Debugbar::error('Error!');
+    Debugbar::warning('Watch out…');
+    Debugbar::addMessage('Another message', 'mylabel');
+    Debugbar::startMeasure('render','Time for rendering');
+   
+    Debugbar::stopMeasure('render');
+    Debugbar::addMeasure('now', LARAVEL_START, microtime(true));
+    Debugbar::startMeasure('now','Time for Larave start');
+    Debugbar::measure('My long operation', function() {
+        // Do something…
+    });
 
-Route::any('foomar', function () {
-    return 'Hello Foomar!';
-});
-
-Route::get('bar', function () {
-    return 'Hello Bar!';
-})->name('bar');
-
-Route::get('barab', [function () {
-    return 'Hello Bar!';
-}, 'as' => 'barz']);
-
-
-Route::get('/hey', function() {
-    return view('hello');
-});
- 
-Route::get('hell', function() {
-    return view('greeting');
-});   
- 
-Route::get('/ole', function() {
-    return view('hello.greeting', ['name' => 'Janus']);
-});
- 
-Route::get('/oleole', function() {
-    return view('hello/greeting', ['name' => 'Ole Janus']);
-});
- 
-Route::get('/heyYou', function() {
-    if (view()->exists('hello/greeting')) {
-        return view('hello/greeting', ['name' => 'Hey U Janus! Whatsapp?']);
+    try {
+        throw new Exception('foobar');
+    } catch (Exception $e) {
+        Debugbar::addException($e);
     }
+    return 'Test Debugbar Tools';
 });
 
-Route::get('/bazuka', function() {
-    return view('hello/bazuka', ['name' => 'Hey U Janus! Whatsapp?', 'title' => 'Bazuka Page', 'fooUrl'=>'heyYou']);
-});
+// Route::get('about', 'AboutController@index');
+Route::get('about', 'AboutController')->name('about');
+Route::get('contact-us', 'ContactController@index')->name('contact');
+
+// Route::get('admin', 'Admin\DashboardController@index');
+Route::get('dashboard', ['uses' => 'Admin\DashboardController@index', 'as' => 'admin']);
+
+Route::get('blog', ['uses' => 'PostController@index', 'as' => 'blog']);
+
+Route::get('blog/create', ['uses' => 'PostController@create', 'as' => 'create']);
+
+Route::post('blog/create', ['uses' => 'PostController@store', 'as' => 'store']);
+
+Route::get('blog/{id}', 
+['uses' => 'PostController@show', 'as' => 'show']);
+
+
