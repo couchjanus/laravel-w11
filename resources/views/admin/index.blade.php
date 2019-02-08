@@ -1,7 +1,9 @@
+@extends('layouts.admin')
 <!-- resources/views/admin/index.blade.php -->
-<html>
-   <body>
-       <h1>{{ $title }}</h1>
-       
-   </body>
-</html>
+
+@section('content')
+    <h2>{{ $title }}</h2>
+    <div class="table-responsive">
+    
+    </div>
+@endsection
