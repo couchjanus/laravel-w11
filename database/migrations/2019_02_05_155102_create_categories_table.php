@@ -15,9 +15,7 @@ class CreateCategoriesTable extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->increments('id');
-            // Эквивалент VARCHAR с длинной
             $table->string('name', 100);
-            //Эквивалент TEXT для базы данных
             $table->text('description');    
             $table->timestamps();
         });
