@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use App\Enums\StatusType;
+use App\Post;
+
+use Illuminate\Support\Facades\Redis;
 
 class PostController extends Controller
 {
@@ -12,29 +16,95 @@ class PostController extends Controller
      *
      * @return Response
      */
-    public function index()
+    public function index1()
     {
-        //     $posts = DB::select('select * from posts');
-        // $posts = DB::table('posts')->get();
-        $posts = DB::table('posts')->paginate(10);
-        // $posts = DB::table('posts')->simplePaginate(10);
+        $posts = Post::where('status', StatusType::Published)->orderBy('updated_at', 'desc')->simplePaginate(5);
+
+        // $expiresAt = \Carbon\Carbon::now()->addMinutes(10);
+           
+        // $posts = \Cache::remember('posts', $expiresAt, function () {
+        //     return Post::where('status', StatusType::Published)->orderBy('updated_at', 'desc')->simplePaginate(5);
+        // });
         
-        // dump($posts);
-        // foreach ($posts as $post) {
-        //     dump($post->title);
-        // }
-       
         return view('blog.index', ['posts' => $posts, 'title'=>'Awesome Blog']);
     }
-  
 
-    public function show($id)
+
+    public function index(Request $request){
+        // Redis::flushAll();
+        
+        $page=1; //Default value
+
+        if($request->get('page')){
+            $page = $request->get('page');
+        }
+        
+        $posts = Redis::get("posts:all:{$page}");
+        // dump($posts);
+        if(!$posts):
+            $posts = Post::where('status', StatusType::Published)->orderBy('id', 'desc')->paginate(5);
+            $postChunk = serialize($posts);
+            Redis::set("posts:all:{$page}", $postChunk);
+        else:
+            $posts = unserialize($posts);
+        endif;
+        return view('blog.index')->with(compact('posts'))->withTitle('Awesome Blog');
+    }
+    
+    // public function show(Post $blog)
+    // {
+    //     return view('blog.show', ['post' => $blog, 'hescomment'=>false]);
+    // }
+
+    // public function show(Post $post)
+    // {
+    //     return view('blog.show', ['post' => $post, 'hescomment'=>false]);
+    // }
+
+    public function show(Post $post)
     {
-        // $post = DB::select("select * from posts where id = :id", ['id' => $id]);
-        $post = DB::table('posts')->where('id', $id)->first();
-        dump($post);
-        // return view('blog.show', ['post' => $post]);
-        // return view('blog.show', ['post' => $post, 'hescomment'=>true]);
+        return view('blog.show', ['post' => $post, 'hescomment'=>false]);
+    }
+
+    public function showFromCache($slug)
+    {
+        $expiresAt = \Carbon\Carbon::now()->addMinutes(10);
+           
+        $post = \Cache::remember($slug, $expiresAt, function () use ($slug) {
+            return Post::whereSlug($slug)->firstOrFail();
+        });
+
+        return view('blog.show', ['post' => $post, 'hescomment'=>false]);
+    }
+
+    /**
+     * PostsController, метод showBySlug:
+     * Вначале мы проверяем, не является ли slug числом.
+     * Часто slug внедряют в программу уже после того,
+     * как был другой механизм построения пути.
+     * Например, через числовые индексы.
+     * Тогда может получится ситуация, что пользователь,
+     * зайдя на сайт по старой ссылке, увидит 404 ошибку,
+     * что такой страницы не существует.
+     */
+    public function showBySlug($slug)
+    {
+        if (is_numeric($slug)) {
+       
+            // Get post for slug.
+            $post = Post::findOrFail($slug);
+            return Redirect::to(route('blog.show', $post->slug), 301);
+            // 301 редирект со старой страницы, на новую.   
+           
+        }
+        // Get post for slug.
+        $post = Post::whereSlug($slug)->firstOrFail();
+
+        return view('blog.show', [
+           'post' => $post,
+           'hescomment' => false
+           ]
+        );
     }
 
     public function getTitle($id)

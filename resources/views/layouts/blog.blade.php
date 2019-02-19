@@ -20,6 +20,7 @@
     <main role="main" class="container">
         <div class="row">
             <div class="col-md-8 blog-main">
+                @include('layouts.partials._flash')
                 @yield('content')
             </div><!-- /.blog-main -->
             

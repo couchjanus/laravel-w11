@@ -1,8 +1,13 @@
 <div class="post-preview">
-        <a href="{{  route('blog.show', $post->id) }}">
-          <h2 class="post-title">{{$post->title}} </h2>
-          </a>
-          <h3 class="post-subtitle"> Problems look mighty small from 150 miles up </h3>
-        <p class="post-meta">Posted by  <a href="#">Janus </a>  {{$post->created_at}}</p>
-      </div>
-      <hr>
+  <a href="{{  route('blog.show', $post->slug) }}">
+    <h2 class="post-title">{{$post->title}} </h2>
+  </a>
+  
+  <p class="post-trunc">{{str_limit($post->content,50)}}</p>
+  
+  <p class="post-meta">Posted by  <a href="#">Janus </a>  {{$post->created_at}}</p>
+  <a href="{!! route('blog.show', $post->slug) !!}"
+    class="btn btn-info">Continue reading
+  </a>
+  <hr>
+</div>

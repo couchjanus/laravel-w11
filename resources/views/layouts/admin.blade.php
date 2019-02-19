@@ -17,6 +17,7 @@
             @include('layouts.partials.backend._sidebar')
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
             @include('layouts.partials.backend._header')
+            @include('layouts.partials._flash')
             @yield('content')
         </main>
         </div><!-- /.row -->

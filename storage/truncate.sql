@@ -1,0 +1,1 @@
+﻿truncate table posts restart identity;

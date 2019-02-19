@@ -28,6 +28,12 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    public function isOnline()
+    {
+        return \Cache::has('user-is-online-' . $this->id);
+    }
+
+
     // protected $casts = ['is_admin' => 'boolean', 'options' => 'array'];
 
     // protected $fillable = ['email', 'password']; // which fields can be filled with User::create()

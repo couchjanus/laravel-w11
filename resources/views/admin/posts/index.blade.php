@@ -45,7 +45,7 @@
               <button class="btn btn-sm btn-outline-primary"><span data-feather="eye"></span>
               </button>
             </a>
-            <a title="Edit post" href="{{ route('posts.edit', ['id'=> $post->id]) }}" class="btn btn-outline-warning"><span data-feather="edit"></span></a>
+            <a title="Edit post" href="{{ route('posts.edit', ['id'=> $post->slug]) }}" class="btn btn-outline-warning"><span data-feather="edit"></span></a>
             <button title="Delete post" type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#delete_post_{{ $post->id  }}"><span data-feather="trash"></span></button>
           </td>
         </tr>

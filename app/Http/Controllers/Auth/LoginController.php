@@ -36,4 +36,12 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+
+    public function logout()
+    {
+        \Cache::forget('user-is-online-' . \Auth::user()->id);
+        \Auth::logout();
+        return redirect('');
+    }
+ 
 }

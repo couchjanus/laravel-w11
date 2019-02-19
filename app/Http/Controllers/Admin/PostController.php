@@ -26,6 +26,8 @@ class PostController extends Controller
         return view('admin.posts.index', ['posts' => $posts]);
     }
 
+
+
     public function testIds()
     {
         // $ids = [1, 2, 3];
@@ -101,8 +103,11 @@ class PostController extends Controller
 
         // Получить post или создать, если не существует...
         $post = Post::firstOrCreate(['title' => $request->title, 'content'=>$request->content, 'status'=>$request->status, 'category_id'=>$request->category_id, 'user_id'=>1]);
-        return redirect(route('posts.index'))->with('success',
-        'Post has been added successfully');
+
+        session()->flash('message', 'Post has been added successfully!');
+        session()->flash('type', 'success');
+        return redirect(route('posts.index'));
+        // return redirect(route('posts.index'))->with('success','Post has been added successfully');
     }
 
     /**
@@ -113,8 +118,8 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        dump($post);
-        // return view('admin.posts.show',compact('post'));
+        // dump($post);
+        return view('admin.posts.show',compact('post'));
     }
 
     public function getFirstPublished()

@@ -62,6 +62,9 @@ class CategoryController extends Controller
         }
  
         Category::create($request->all());
+
+        session()->flash('message', 'Category has been added successfully!');
+        session()->flash('type', 'success');
         
         return redirect(route('categories.index'))->with('success',
         'Category has been added successfully');

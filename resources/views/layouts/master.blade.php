@@ -34,6 +34,7 @@
     <div id="app">
         @yield('navigation')
         
+        
         @yield('jumbotron')
                
         @yield('page')
@@ -41,6 +42,11 @@
     </div>
     
     <!-- Scripts -->
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+    <script>
+        feather.replace()
+    </script>
     <script src="{{ asset('js/app.js') }}" defer></script>
     @yield('scripts')
 </body>

@@ -5,19 +5,15 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Builder;
+use Cviebrock\EloquentSluggable\Sluggable;
 
 class Post extends Model
 {
-    // Таблица, связанная с моделью. 
-    protected $table = 'posts';
+    use Sluggable;
+    
+    protected $perPage = 10; 
 
-    // protected $primaryKey = 'uuid'; // Если у вас нету поля 'id'
-    // public $incrementing = false; // Указывает что primary key не имеет свойства auto increment
-   
-    // переопределяем кол-во результатов на странице при пагинации (по-умолчанию: 15)
-    protected $perPage = 25; 
-
-    protected $dates = ['created_at', 'deleted_at']; // which fields will be Carbon-ized
+    protected $dates = ['created_at', 'deleted_at']; 
 
     protected $fillable = [
         'title', 'content', 'status', 'category_id', 'user_id'
@@ -28,10 +24,49 @@ class Post extends Model
     protected static function boot()
     {
         parent::boot();
-        // Order by name ASC
         static::addGlobalScope('title', function (Builder $builder) {
             $builder->orderBy('title', 'asc');
         });
+
+        // \Route::bind('post', function ($value) {
+        //     return Post::where('post', $value)->first() ?? abort(404);
+        // });
     }
-     
+
+    /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveRouteBinding($value)
+    {
+        return $this->where('slug', $value)->first() ?? abort(404);
+    }
+
+    /**
+     * Return the sluggable configuration array for this model.
+     *
+     * @return array
+     */
+    public function sluggable()
+    {
+        return [
+            'slug' => [
+                'source' => 'title'
+            ]
+        ];
+    }
+
+    /**
+     * 
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+ 
 }

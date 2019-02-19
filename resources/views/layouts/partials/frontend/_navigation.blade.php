@@ -40,7 +40,7 @@
 
                                 <a  class="dropdown-item" href="">Private</a>
 
-                                <form id="logout-form" action="" method="POST" style="display: none;">
+                                <form id="logout-form" action="logout" method="POST" style="display: none;">
                                     @csrf
                                 </form>
                             </div>
