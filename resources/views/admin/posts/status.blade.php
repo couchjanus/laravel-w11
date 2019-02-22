@@ -48,9 +48,7 @@
     <thead>
       <tr>
         <th>Title</th>
-        <th>
-            <a href="{{ route('posts.sort', ['order' => ($order=='desc')?'asc':'desc']) }}">Modified</a>
-        </th>
+        <th>Posted On</th>
         <th>Status</th>
         <th>Action</th>
       </tr>
@@ -59,7 +57,7 @@
       @foreach($posts as $post)
         <tr>
           <td>{{ $post->title }}</td>
-          <td>{{ date('d F Y', strtotime($post->updated_at)) }}</td>
+          <td>{{ date('d F Y', strtotime($post->created_at)) }}</td>
           <td>{{ $status[$post->status] }} </td>
           <td>
             <a title="Read post" href="{{ route('posts.show', ['id'=> $post->id]) }}">
@@ -103,7 +101,7 @@
   </table>
   <!-- Pagination -->
   <div class="pagination justify-content-center mb-4">
-    {{ $posts->links() }}
+    {{ $posts->appends(['status' => $statusPost])->links() }}
   </div>
 </div>
 

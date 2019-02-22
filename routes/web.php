@@ -26,21 +26,21 @@ Route::get('contact-us', 'ContactController@index')->name('contact');
 // Route::get('blog/{id}', 
 // ['uses' => 'PostController@show', 'as' => 'show']);
 
-// Route::resource(
-//         'blog', 'PostController', [
-//             'only' => [
-//                 'index', 'show'
-//             ]
-//         ]
-//     );
-
 Route::resource(
         'blog', 'PostController', [
-            'except' => [
-                'create', 'store', 'update', 'destroy'
+            'only' => [
+                'index', 'show'
             ]
         ]
     );
+
+// Route::resource(
+//         'blog', 'PostController', [
+//             'except' => [
+//                 'create', 'store', 'update', 'destroy'
+//             ]
+//         ]
+//     );
  
 
 // Route::get('admin', 'Admin\DashboardController@index');
@@ -48,6 +48,10 @@ Route::resource(
 
 // Зарегистрировать маршрут контроллера ресурса:
 // Route::resource('posts', 'Admin\PostController');
+
+
+Route::get('admin/status', 'Admin\PostController@getPostsByStatus')->name('posts.status');
+Route::get('admin/sort', 'Admin\PostController@sortPostsByDate')->name('posts.sort');
 
 Route::prefix('admin')->group(function () {
     Route::get('', 'Admin\DashboardController@index');

@@ -5,3 +5,5 @@
 
 <!-- Post Content -->
 <p class="lead">{{ $post->content }}</p>
+
+<span data-feather="tag"></span> {{ $post->visited }}

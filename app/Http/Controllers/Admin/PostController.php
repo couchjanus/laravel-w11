@@ -19,13 +19,35 @@ class PostController extends Controller
      */
     public function index()
     {
-        // return "Index Post";
-        // $posts = Post::all();
         $posts = Post::paginate();
         // dump($posts);
-        return view('admin.posts.index', ['posts' => $posts]);
+        $order = 'asc'; 
+        $status = StatusType::toSelectArray();
+        return view('admin.posts.index', compact('posts', 'status', 'order'));
     }
 
+    public function getPostsByStatus(Request $request)
+    {
+        // dump($request);
+        static $statusPost;
+        $status = StatusType::toSelectArray();
+        // $posts = Post::whereStatus($request->status)->paginate();
+        $statusPost = $request->status; 
+        $posts = Post::status($statusPost)->paginate(5);
+        // dump($posts);
+        return view('admin.posts.status', compact('posts', 'status', 'statusPost'));
+    }
+
+    public function sortPostsByDate(Request $request)
+    {
+        $status = StatusType::toSelectArray();
+        $order = isset($request->order)?$request->order:'desc'; 
+        $posts = Post::orderBy('updated_at', $order)->paginate();
+        // dump($posts);
+       
+        return view('admin.posts.index', compact('posts', 'status', 'order'));
+    }
+    
     public function testIds()
     {
         // $ids = [1, 2, 3];
@@ -55,6 +77,7 @@ class PostController extends Controller
         
         // $result = Post::where('id', 1)->orWhere(['id' => 2, 'id' => 3])->get();
 
+
         dump($result);
     }
 
@@ -75,7 +98,6 @@ class PostController extends Controller
      */
     public function create()
     {
- 
         $categories = Category::all(); 
         $status = StatusType::toSelectArray(); 
         return view('admin.posts.create')->withStatus($status)->withCategories($categories);
@@ -96,8 +118,6 @@ class PostController extends Controller
         ]);
         
         // прошло проверку, сохранение в БД...
-
-
 
         // Получить post или создать, если не существует...
         $post = Post::firstOrCreate(['title' => $request->title, 'content'=>$request->content, 'status'=>$request->status, 'category_id'=>$request->category_id, 'user_id'=>1]);
@@ -152,7 +172,6 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        
         // $post->updated_at = '2019-01-01 10:00:00';
         // $post->save(['timestamps' => false]);
 
