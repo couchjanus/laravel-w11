@@ -17,54 +17,34 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+
+     public function index()
     {
-        // return "Index Post";
-        // $posts = Post::all();
         $posts = Post::paginate();
-        // dump($posts);
-        return view('admin.posts.index', ['posts' => $posts]);
+        $order = 'asc'; 
+        $status = StatusType::toSelectArray();
+        return view('admin.posts.index', compact('posts', 'status', 'order'));
     }
 
-
-
-    public function testIds()
+    public function getPostsByStatus(Request $request)
     {
-        // $ids = [1, 2, 3];
-        // $result = $this->getByIds($ids);
-
-        // $result = Post::where('id', '>', 40)->take(10)->get();
-
-        // $result = Post::where([
-        //     ['id','>', 40],
-        //     ['status', '=', 1],
-        // ])->get();
-        
-        // $result = Post::where('category_id', 1)->get();
-        // это:
-        // $result = Post::whereCategoryId(3)->get();
-
-        // $result = Post::whereDate('created_at', date('Y-m-d'));
-        // $result = Post::whereDay('created_at', date('d'));
-        // $result = Post::whereMonth('created_at', date('m'));
-        // $result = Post::whereYear('created_at', date('2019'))->get();
-
-        // $result = Post::where('id', 1);
-        // $result = Post::orWhere('id', 2);
-        // $result = Post::orWhere('id', 3);
-
-        // Вы можете сделать это так:
-        
-        // $result = Post::where('id', 1)->orWhere(['id' => 2, 'id' => 3])->get();
-
-        dump($result);
+        static $statusPost;
+        $status = StatusType::toSelectArray();
+        $statusPost = $request->status; 
+        $posts = Post::status($statusPost)->paginate(5);
+        return view('admin.posts.status', compact('posts', 'status', 'statusPost'));
     }
 
+    public function sortPostsByDate(Request $request)
+    {
+        $status = StatusType::toSelectArray();
+        $order = isset($request->order)?$request->order:'desc'; 
+        $posts = Post::orderBy('updated_at', $order)->paginate();
+        return view('admin.posts.index', compact('posts', 'status', 'order'));
+    }
 
     public function getByIds($ids)
     {
-        // Можно вызвать метод findMany с массивом первичных ключей,
-        // который вернет коллекцию подходящих записей:
         // return Post::find($ids);
         // return Post::findMany($ids);
         return Post::whereIn('id', $ids)->get();
@@ -77,7 +57,6 @@ class PostController extends Controller
      */
     public function create()
     {
- 
         $categories = Category::all(); 
         $status = StatusType::toSelectArray(); 
         return view('admin.posts.create')->withStatus($status)->withCategories($categories);
@@ -91,19 +70,11 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        // Проверка запроса...
         $this->validate($request, [
             'title' => 'required|unique:posts|max:255',
             'content' => 'required',
         ]);
-        
-        // прошло проверку, сохранение в БД...
-
-
-
-        // Получить post или создать, если не существует...
         $post = Post::firstOrCreate(['title' => $request->title, 'content'=>$request->content, 'status'=>$request->status, 'category_id'=>$request->category_id, 'user_id'=>1]);
-
         session()->flash('message', 'Post has been added successfully!');
         session()->flash('type', 'success');
         return redirect(route('posts.index'));
@@ -120,13 +91,6 @@ class PostController extends Controller
     {
         // dump($post);
         return view('admin.posts.show',compact('post'));
-    }
-
-    public function getFirstPublished()
-    {
-        // Получение первой модели, удовлетворяющей условиям...
-        dump(Post::where('status', 2)->first());
-        // return Post::where('status', 2)->first();
     }
 
     public function getFirstOrFail($id)
@@ -157,11 +121,6 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        
-        // $post->updated_at = '2019-01-01 10:00:00';
-        // $post->save(['timestamps' => false]);
-
-        // Если подходящей модели нет, создать новую.
         $post->updateOrCreate(['title' => $request->title, 'content'=>$request->content, 'status'=>$request->status, 'category_id'=>$request->category_id, 'user_id'=>1]);
         return redirect(route('posts.index'))->with('success',
         'Post has been updated successfully');
@@ -175,6 +134,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect()->route('posts.index')
+                ->with('success','Post deleted successfully');
     }
 }

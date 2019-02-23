@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
+
 class UserController extends Controller
 {
     /**
@@ -18,6 +19,21 @@ class UserController extends Controller
         $users = User::paginate();
         // dump($users);
         return view('admin.users.index', ['users' => $users]);
+    }
+
+    public function trashed()
+    {
+        $users = User::onlyTrashed()->paginate(env('LIST_PAGINATION_SIZE'));
+        return view('admin.users.trashed', compact('users'));
+    }
+
+    public function restore($id)
+    {
+        User::withTrashed()
+            ->where('id', $id)
+            ->restore();
+
+        return redirect(route('users.trashed'))->with('success', 'User has been restored successfully');
     }
 
     /**
@@ -83,6 +99,27 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->delete();
+        return redirect()->route('users.index')
+                ->with('success','User deleted successfully');
+    }
+
+    // public function userDestroy($id)
+    // {
+    //     $user = User::withTrashed()
+    //             ->findOrFail($id);
+    //     // dd($user);
+    //     $user->forceDelete();
+    //     return redirect()->route('users.index')
+    //             ->with('success','User deleted successfully');
+
+    // }
+
+    public function userDestroy($id)
+    {
+        User::trash($id)->forceDelete();
+        return redirect()->route('users.index')
+                ->with('success','User deleted from tresh successfully');
+
     }
 }

@@ -138,8 +138,18 @@ Route::get('blog/{post}','PostController@showFromCache')->name('blog.show');
 // Зарегистрировать маршрут контроллера ресурса:
 // Route::resource('posts', 'Admin\PostController');
 
+Route::get('admin/status', 'Admin\PostController@getPostsByStatus')->name('posts.status');
+Route::get('admin/sort', 'Admin\PostController@sortPostsByDate')->name('posts.sort');
+Route::post('/restore/{id}', 'Admin\UserController@restore')->name('users.restore');
+
+// Route::delete('/userdestroy/{id}', 'Admin\UserController@userDestroy')->name('user.force.destroy');
+
+// Route::delete('/userdestroy/{user}', 'Admin\UserController@userDestroy')->name('user.force.destroy');
+
 Route::prefix('admin')->group(function () {
     Route::get('', 'Admin\DashboardController@index');
+    Route::get('trashed', 'Admin\UserController@trashed')->name('users.trashed');
+    Route::delete('user-destroy/{id}', 'Admin\UserController@userDestroy')->name('user.force.destroy');
     Route::get('test/{id}', 'Admin\PostController@getFirstOrFail');
     Route::resource('posts', 'Admin\PostController');
     Route::resource('users', 'Admin\UserController');

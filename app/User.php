@@ -5,10 +5,12 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
     use Notifiable;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -33,8 +35,25 @@ class User extends Authenticatable
         return \Cache::has('user-is-online-' . $this->id);
     }
 
+    /**
+     * Атрибуты, которые должны быть преобразованы в даты.
+    * @var array
+     */
+    protected $dates = [
+        'deleted_at',
+    ];
 
-    // protected $casts = ['is_admin' => 'boolean', 'options' => 'array'];
+    /**
+     * Scope a query to only include posts of a given type.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
 
-    // protected $fillable = ['email', 'password']; // which fields can be filled with User::create()
+    public static function scopeTrash($query, $id)
+    {
+        return $query->withTrashed()->where('id', $id)->first();       
+    }
+
 }

@@ -8,7 +8,8 @@
           <a href="{{ route('users.create') }}" title="Add New Users">
               <button class="btn btn-sm btn-outline-success"><span data-feather="plus"></span> Add New</button>
           </a>
-          <button class="btn btn-sm btn-outline-secondary">Export</button>
+          <a href="{{ route('users.trashed') }}" title="Trashed Posts"><button class="btn btn-sm btn-outline-secondary"><span data-feather="trash"></span> Trashed List</button>
+          </a>
         </div>
         
         <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
@@ -19,7 +20,18 @@
   </div>
     
   <div class="table-responsive">
+    @if ($message = Session::get('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <span class="badge badge-pill badge-success">Success</span> {!! $message !!}
+        </div>
+    @endif
     <table class="table table-hover">
+      @if($users->count() === 0)
+        <div class="well text-center">No users found.</div>
+      @else
       <thead>
         <tr>
           <th>Id</th>
@@ -45,39 +57,13 @@
               <td>{{ $user->email }}</td>
               <td>
                   <a title="Show User" href="{{ route('users.show', ['id'=> $user->id]) }}" class="btn btn-primary"><span class="fa fa-newspaper-o"></span></a>
-                  <a title="Edit article" href="{{ route('users.edit', ['id'=> $user->id]) }}" class="btn btn-warning"><span class="fa fa-edit"></span></a>
-                  <button title="Delete user" type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete_user_{{ $user->id  }}"><span class="fa fa-trash-o"></span></button>
+                  <a title="Edit user" href="{{ route('users.edit', ['id'=> $user->id]) }}" class="btn btn-warning"><span class="fa fa-edit"></span></a>
+                  <form action="{{ route('users.destroy', ['id' => $user->id]) }}" method="post" style="display: inline">@method('DELETE') @csrf
+                    <button title="Delete user" type="submit" class="btn btn-outline-danger"><span data-feather="trash"></span></button>
+                  </form>  
               </td>
           </tr>
-
-          <div class="modal fade" id="delete_user_{{ $user->id  }}" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-              <form class="" action="{{ route('users.destroy', ['id' => $user->id]) }}" method="post">
-                  <input type="hidden" name="_method" value="DELETE">
-                  <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
-                  <div class="modal-dialog modal-sm">
-                  <div class="modal-content">
-                      <div class="modal-header bg-red">
-                      <h4 class="modal-title" id="mySmallModalLabel">Delete user</h4>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                      </button>
-                      </div>
-
-                      <div class="modal-body">
-                      Are you sure to delete user: <b>{{ $user->title }} </b>?
-                      </div>
-                      <div class="modal-footer">
-                      <a href="{{ url('/users') }}">
-                          <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
-                      </a>
-                      <button type="submit" class="btn btn-outline" title="Delete" value="delete">Delete</button>
-                      </div>
-                  </div>
-                  </div>
-              </form>
-              </div>
-          @endforeach
+        @endforeach
       </tbody>
     </table>
   </div>
@@ -85,4 +71,5 @@
   <div class="pagination justify-content-center mb-4">
       {{ $users->links() }}
   </div>
+  @endif
 @endsection

@@ -74,7 +74,15 @@ class PostController extends Controller
             return Post::whereSlug($slug)->firstOrFail();
         });
 
+        $post->update(['visited'=>$post->visited+1]);
+
         return view('blog.show', ['post' => $post, 'hescomment'=>false]);
+    }
+
+    public function showById($id)
+    {
+        $post =Post::where('id', $id)->first();
+        return view('blog.show', ['post' => $post, 'hescomment'=>true]);
     }
 
     /**
@@ -98,8 +106,10 @@ class PostController extends Controller
            
         }
         // Get post for slug.
-        $post = Post::whereSlug($slug)->firstOrFail();
+        $post->update(['visited'=>$post->visited+1]);
 
+        $post = Post::whereSlug($slug)->firstOrFail();
+        
         return view('blog.show', [
            'post' => $post,
            'hescomment' => false
@@ -223,69 +233,5 @@ class PostController extends Controller
                 ->get();
         return view('blog.index', ['posts' => $posts]);
     }
-
-    public function create()
-    {
-        return view('blog.create', ['title'=>'Awesome Blog']);
-    }
-
-    public function store(Request $request)
-    {
-        // DB::insert('insert into posts (title, content') `values (?, ?)', [$request['title'], $request['content']]);
-
-        // DB::table('posts')
-        //     ->insert(['content' => $request['content'], 'title'=>$request['title'], 'created_at' => \Carbon\Carbon::now(), 'updated_at' => \Carbon\Carbon::now()]);
-            
-        $id = DB::table('posts')
-        ->insertGetId(['content' => $request['content'], 'title'=>$request['title'], 'created_at' => \Carbon\Carbon::now(), 'updated_at' => \Carbon\Carbon::now()]);
-        dump($id);
-
-        // DB::table('posts')->insert(
-        //     ['title' => 'The query builder also provides an insert method', 'content' => 'The query builder also provides an insert method for inserting records into the database table. The insert method accepts an array of column names and values']
-        // );
-        
-        // dump($request);
-
-        // DB::table('posts')->insert(
-        //     ['title' => 'You may even insert several records', 'content' => 'You may even insert several records into the table with a single call to insert by passing an array of arrays. Each array represents a row to be inserted into the table'],
-        //     ['title' => 'The query builder also provides an insert method', 'content' => 'The query builder also provides an insert method for inserting records into the database table. The insert method accepts an array of column names and values']
-        // );
-
-        // Auto-Incrementing IDs
-
-        // $id = DB::table('posts')->insertGetId(
-        //     ['title' => 'Auto-Incrementing IDs', 'content' => 'If the table has an auto-incrementing id, use the insertGetId method to insert a record and then retrieve the ID', 'created_at' => \Carbon\Carbon::now(), 'updated_at' => \Carbon\Carbon::now()]
-        // );
-
-        // dump($id);
-    }
-
-    public function update(Request $request, $id)
-    {
-        // $sql = "UPDATE posts SET title= ? content= ? WHERE id= ?";
-        // DB::update($sql, array($request['title'], $request['content'], 'id' => $id));
-
-        DB::table('posts')
-            ->where('id', 10)
-            ->update(['content' => 'Of course, in addition to inserting records into the database, the query builder can also update existing records using the update method. The update method, like the insert method, accepts an array of column and value pairs containing the columns to be updated. You may constrain the update query using where clauses:']);
-
-        // DB::table('posts')
-        //     ->where('id', $id)
-        //     ->update(['content' => $request['content'], 'title'=>$request['title']]);
-    }
-
-    public function destroy($id)
-    {
-        // $deleted = DB::delete('delete from posts');
-        DB::table('posts')
-            ->where('id', $id)
-            ->delete();
-        
-        // DB::table('posts')->delete();
-        // DB::table('posts')->where('id', '>', 100)->delete();
-
-        // If you wish to truncate the entire table, which will remove all rows and reset the auto-incrementing ID to zero, you may use the truncate method:
-        // DB::table('posts')->truncate();
-    }
-
+    
 }
