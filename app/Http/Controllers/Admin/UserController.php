@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserStoreFormRequest;
 
+use Hash;
+
+use App\Profile;
 
 class UserController extends Controller
 {
@@ -43,7 +47,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.users.create');
     }
 
     /**
@@ -52,9 +56,32 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    // public function store(UserStoreFormRequest $request)
+    // {
+    //     User::create([
+    //         'name' => $request['name'],
+    //         'email' => $request['email'],
+    //         'password' => Hash::make($request['password']),
+    //     ]);
+    //     session()->flash('message', 'User has been added successfully!');
+    //     session()->flash('type', 'success');
+    //     return redirect()->route('users.index');
+    // }
+
+    public function store(UserStoreFormRequest $request)
     {
-        //
+        $user = User::create([
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'password' => Hash::make($request['password']),
+        ]);
+
+        $profile = new Profile();
+        $user->profile()->save($profile);
+ 
+        session()->flash('message', 'User has been added successfully!');
+        session()->flash('type', 'success');
+        return redirect()->route('users.index');
     }
 
     /**
@@ -120,6 +147,5 @@ class UserController extends Controller
         User::trash($id)->forceDelete();
         return redirect()->route('users.index')
                 ->with('success','User deleted from tresh successfully');
-
     }
 }

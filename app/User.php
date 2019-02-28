@@ -7,6 +7,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use Hash;
+
 class User extends Authenticatable
 {
     use Notifiable;
@@ -54,6 +56,17 @@ class User extends Authenticatable
     public static function scopeTrash($query, $id)
     {
         return $query->withTrashed()->where('id', $id)->first();       
+    }
+
+    public function setPasswordAttribute($input)
+    {
+        if ($input)
+            $this->attributes['password'] = app('hash')->needsRehash($input) ? Hash::make($input) : $input;
+    }
+
+    public function profile()
+    {
+        return $this->hasOne('App\Profile');
     }
 
 }

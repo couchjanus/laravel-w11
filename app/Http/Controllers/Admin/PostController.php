@@ -18,7 +18,7 @@ class PostController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-     public function index()
+    public function index()
     {
         $posts = Post::paginate();
         $order = 'asc'; 
@@ -57,9 +57,11 @@ class PostController extends Controller
      */
     public function create()
     {
-        $categories = Category::all(); 
+        $categories = Category::all();
+        // $tags = Tag::all();
+        $tags = \App\Tag::all();//get()->pluck('name', 'id');
         $status = StatusType::toSelectArray(); 
-        return view('admin.posts.create')->withStatus($status)->withCategories($categories);
+        return view('admin.posts.create')->withStatus($status)->withCategories($categories)->withTags($tags);
     }
 
     /**
@@ -75,10 +77,8 @@ class PostController extends Controller
             'content' => 'required',
         ]);
         $post = Post::firstOrCreate(['title' => $request->title, 'content'=>$request->content, 'status'=>$request->status, 'category_id'=>$request->category_id, 'user_id'=>1]);
-        session()->flash('message', 'Post has been added successfully!');
-        session()->flash('type', 'success');
-        return redirect(route('posts.index'));
-        // return redirect(route('posts.index'))->with('success','Post has been added successfully');
+        $post->tags()->sync((array)$request->input('tag'));
+        return redirect(route('posts.index'))->with('type','success')->with('message','Post has been added successfully');;
     }
 
     /**
@@ -109,7 +109,8 @@ class PostController extends Controller
     {
         $categories = Category::pluck('name', 'id'); 
         $status = StatusType::toSelectArray(); 
-        return view('admin.posts.edit')->withPost($post)->withStatus($status)->withCategories($categories);
+        $tags = \App\Tag::get()->pluck('name', 'id');
+        return view('admin.posts.edit')->withPost($post)->withStatus($status)->withCategories($categories)->withTags($tags);
     }
 
     /**
@@ -122,8 +123,8 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         $post->updateOrCreate(['title' => $request->title, 'content'=>$request->content, 'status'=>$request->status, 'category_id'=>$request->category_id, 'user_id'=>1]);
-        return redirect(route('posts.index'))->with('success',
-        'Post has been updated successfully');
+        $post->tags()->sync((array)$request->input('tag'));
+        return redirect(route('posts.index'))->with('type','success')->with('message','Post has been updated successfully!');;
     }
 
     /**
@@ -134,8 +135,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
+        $post->tags()->detach();
         $post->delete();
-        return redirect()->route('posts.index')
-                ->with('success','Post deleted successfully');
+        return redirect()->route('posts.index')->with('type','success')->with('message','Post deleted successfully');
     }
 }

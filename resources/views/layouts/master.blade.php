@@ -16,6 +16,9 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+    
+
     {{--Styles--}}
     @yield('styles')
     {{--Head--}}
@@ -34,8 +37,9 @@
     <script>
         feather.replace()
     </script>
-
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    
+    <script src="{{ asset('js/app.js') }}"></script>
+   
     @yield('scripts')
 </body>
 </html>

@@ -52,6 +52,27 @@
                             @endforeach
                         </select>
                     </div>
+
+                    <div class="form-group">
+                            <label for="selectall-tag" class= 'control-label'>Select tags</label>
+                            <button type="button" class="btn btn-primary btn-xs" id="selectbtn-tag">
+                                Select all
+                            </button>
+                            <button type="button" class="btn btn-primary btn-xs" id="deselectbtn-tag">
+                                Deselect all
+                            </button>
+                            <select name="tag[]" class="form-control select2" multiple='multiple' id='selectall-tag'>
+                                @foreach($tags as $tag)
+                                    <option value="{{$tag->id}}">{{ $tag->name}}</option>
+                                @endforeach
+                            </select>
+                            <p class="help-block"></p>
+                            @if($errors->has('tag'))
+                                <p class="help-block">
+                                    {{ $errors->first('tag') }}
+                                </p>
+                            @endif
+                    </div>
                     
                     <div class="form-group">
                         <label for="status">Status</label>
@@ -72,4 +93,21 @@
             </div>
         </form>
     </div>
+@endsection
+@section('scripts')
+    @parent
+    <script>
+        $("#selectbtn-tag").click(function(){
+            $("#selectall-tag > option").prop("selected","selected");
+            $("#selectall-tag").trigger("change");
+        });
+        $("#deselectbtn-tag").click(function(){
+            $("#selectall-tag > option").prop("selected","");
+            $("#selectall-tag").trigger("change");
+        });
+
+        $(document).ready(function () {
+            $('.select2').select2();
+        });
+    </script>
 @endsection

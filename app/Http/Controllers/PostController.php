@@ -16,38 +16,19 @@ class PostController extends Controller
      *
      * @return Response
      */
-    public function index1()
+    public function index()
     {
         $posts = Post::where('status', StatusType::Published)->orderBy('updated_at', 'desc')->simplePaginate(5);
-
-        // $expiresAt = \Carbon\Carbon::now()->addMinutes(10);
-           
-        // $posts = \Cache::remember('posts', $expiresAt, function () {
-        //     return Post::where('status', StatusType::Published)->orderBy('updated_at', 'desc')->simplePaginate(5);
-        // });
-        
         return view('blog.index', ['posts' => $posts, 'title'=>'Awesome Blog']);
     }
-
-
-    public function index(Request $request){
-        // Redis::flushAll();
-        
-        $page=1; //Default value
-
-        if($request->get('page')){
-            $page = $request->get('page');
-        }
-        
-        $posts = Redis::get("posts:all:{$page}");
-        // dump($posts);
-        if(!$posts):
-            $posts = Post::where('status', StatusType::Published)->orderBy('id', 'desc')->paginate(5);
-            $postChunk = serialize($posts);
-            Redis::set("posts:all:{$page}", $postChunk);
-        else:
-            $posts = unserialize($posts);
-        endif;
+    
+    public function getPostsByCategory($categoryId) 
+    {
+        $posts = \App\Category::find($categoryId)
+            ->posts()
+            ->where('status', StatusType::Published)
+            ->orderBy('updated_at', 'desc')
+            ->paginate(5);
         return view('blog.index')->with(compact('posts'))->withTitle('Awesome Blog');
     }
     
@@ -115,12 +96,6 @@ class PostController extends Controller
            'hescomment' => false
            ]
         );
-    }
-
-    public function getTitle($id)
-    {
-        $title = DB::table('posts')->where('id', $id)->value('title');
-        return $title;
     }
 
     public function getLatestPost()
