@@ -64,6 +64,13 @@
                                 @endif
                             </div>
                         </div>
+                        <div class="form-group row">
+                            <div class="col">
+                                  <hr>
+                                  <p class="text-center margin-bottom-3">Or Login with</p>
+                                  @include('auth.partials._socials-icons')
+                             </div>
+                        </div>                      
                     </form>
                 </div>
             </div>

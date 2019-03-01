@@ -64,12 +64,13 @@ Route::prefix('admin')->group(function () {
     
 });
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 Route::get('/home', 'HomeController@index')->name('home');
 
+// Только проверенные пользователи могут войти ..
 Route::middleware('web')->group(function () {
-  Route::middleware('auth')->prefix('profile')->group(function () {
+  Route::middleware('auth')->middleware('verified')->prefix('profile')->group(function () {
       Route::get('', 'ProfileController@index')
           ->name('profile');
       Route::put('information', 'ProfileController@store')
@@ -78,9 +79,53 @@ Route::middleware('web')->group(function () {
           ->name('profile.security');
       Route::put('security', 'ProfileController@storePassword')
           ->name('profile.security.store');
-      // Route::get('delete-account', 'ProfileController@showDeleteAccountConfirmation')
-      //     ->name('profile.delete.show');
-      // Route::delete('delete-account', 'ProfileController@deleteAccount')
-      //     ->name('profile.remove');
   });
 });
+
+// Route::get('/reminder', function () {
+//     return new App\Mail\Reminder();
+// });
+
+// Route::get('/reminder', function () {
+//     return new App\Mail\Reminder(storage_path('/app/public/logo.png'));
+// });
+
+Route::get('/reminder', function () {
+    return new App\Mail\Reminder(public_path('/images/cat.jpg'), 'Blahamuha');
+});
+
+// Route::get('/order', function () {
+//     return new App\Mail\OrderShipped();
+// });
+
+
+// Route::get('/order', function () {
+//     $invoice = 'Your Invoice Send';
+//     return (new App\Mail\OrderShipped($invoice))->render();
+// });
+
+
+Route::get('/order', function () {
+    $invoice = App\Order::find(1);
+    // return (new App\Mail\OrderShipped($invoice))->render();
+    return new App\Mail\OrderShipped($invoice);
+});
+
+Route::get('ship', 
+   ['as' => 'order.index', 'uses' => 'OrderController@index']);
+
+Route::post('ship/{id}', 
+   ['as' => 'order.ship', 'uses' => 'OrderController@ship']);
+
+
+Route::get('/feedback', 'FeedbackController@create');
+Route::post('/feedback/create', 'FeedbackController@store');
+
+Route::get('/feedbacks', 'Admin\FeedbackController@index')->name('feedbacks.index');
+Route::get('/feedbacks/delete/{id}', 'Admin\FeedbackController@destroy');
+   
+// Socialite Register Routes
+   
+// Route::get('social/{provider}', 'Auth\SocialController@redirect')->name('social.redirect');
+// Route::get('social/{provider}/callback', 'Auth\SocialController@callback')->name('social.callback');
+   
