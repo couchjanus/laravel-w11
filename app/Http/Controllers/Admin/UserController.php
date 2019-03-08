@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserStoreFormRequest;
 
 use Hash;
+use App\Role;
 
 use App\Profile;
 
@@ -21,7 +22,6 @@ class UserController extends Controller
     public function index()
     {
         $users = User::paginate();
-        // dump($users);
         return view('admin.users.index', ['users' => $users]);
     }
 
@@ -37,7 +37,7 @@ class UserController extends Controller
             ->where('id', $id)
             ->restore();
 
-        return redirect(route('users.trashed'))->with('success', 'User has been restored successfully');
+        return redirect(route('users.trashed'))->withType('success')->withMessage('User has been restored successfully!');
     }
 
     /**
@@ -47,7 +47,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('admin.users.create');
+        $roles = Role::all();
+        return view('admin.users.create')->withRoles($roles);
     }
 
     /**
@@ -56,18 +57,6 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    // public function store(UserStoreFormRequest $request)
-    // {
-    //     User::create([
-    //         'name' => $request['name'],
-    //         'email' => $request['email'],
-    //         'password' => Hash::make($request['password']),
-    //     ]);
-    //     session()->flash('message', 'User has been added successfully!');
-    //     session()->flash('type', 'success');
-    //     return redirect()->route('users.index');
-    // }
-
     public function store(UserStoreFormRequest $request)
     {
         $user = User::create([
@@ -78,10 +67,11 @@ class UserController extends Controller
 
         $profile = new Profile();
         $user->profile()->save($profile);
- 
-        session()->flash('message', 'User has been added successfully!');
-        session()->flash('type', 'success');
-        return redirect()->route('users.index');
+
+        // $user->syncRoles($request->role);
+        $user->roles()->sync($request->role, false);
+
+        return redirect()->route('users.index')->withType('success')->withMessage('User has been added successfully!');
     }
 
     /**
@@ -93,6 +83,7 @@ class UserController extends Controller
     public function show(User $user)
     {
         //
+        
     }
 
     /**
@@ -103,7 +94,9 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        //
+        $roles = Role::get()->pluck('name', 'id');
+        return view('admin.users.edit')->withUser($user)->withRoles($roles);
+
     }
 
     /**
@@ -115,7 +108,11 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        $user->update(['name' => $request->name]);
+        $user->roles()->sync((array)$request->input('role'));
+        // $user->syncRoles((array)$request->input('role'));
+        return redirect(route('users.index'))->with('type','success')->with('message','User has been updated successfully!');
+  
     }
 
     /**
@@ -128,24 +125,13 @@ class UserController extends Controller
     {
         $user->delete();
         return redirect()->route('users.index')
-                ->with('success','User deleted successfully');
+            ->withType('success')->withMessage('User moved to tresh successfully!');
     }
-
-    // public function userDestroy($id)
-    // {
-    //     $user = User::withTrashed()
-    //             ->findOrFail($id);
-    //     // dd($user);
-    //     $user->forceDelete();
-    //     return redirect()->route('users.index')
-    //             ->with('success','User deleted successfully');
-
-    // }
 
     public function userDestroy($id)
     {
         User::trash($id)->forceDelete();
         return redirect()->route('users.index')
-                ->with('success','User deleted from tresh successfully');
+            ->withType('success')->withMessage('User deleted from tresh successfully!');
     }
 }

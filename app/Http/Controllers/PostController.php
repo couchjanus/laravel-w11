@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use DB;
 use App\Enums\StatusType;
 use App\Post;
+use Gate;
+
+use App\Http\Requests\PostUpdateFormRequest;
 
 use Illuminate\Support\Facades\Redis;
 
@@ -21,6 +24,8 @@ class PostController extends Controller
         $posts = Post::where('status', StatusType::Published)->orderBy('updated_at', 'desc')->simplePaginate(5);
         return view('blog.index', ['posts' => $posts, 'title'=>'Awesome Blog']);
     }
+
+
     
     public function getPostsByCategory($categoryId) 
     {
@@ -119,76 +124,7 @@ class PostController extends Controller
             ->first();
         return view('blog.show', ['post' => $post]);
     }
-
-    public function getPostsByWere()
-    {
-        $posts = DB::table('posts')
-            ->where('id', '>=', 100)
-            ->get();
-
-        // $posts = DB::table('posts')
-        //     ->where('id', '<>', 100)
-        //     ->get();
-
-        // $posts = DB::table('posts')
-        //     ->where('title', 'like', 'T%')
-        //     ->get();
-
-        // $posts = DB::table('posts')->where([
-        //     ['status', '=', '1'],
-        //     ['id', '>', '100'],
-        // ])->get();
-
-        // $posts = DB::table('posts')
-        //     ->where('id', '>', 100)
-        //     ->orWhere('status', true)
-        //     ->get();
-
-        // $posts = DB::table('posts')
-        //     ->whereBetween('id', [1, 100])->get();
-
-        // $posts = DB::table('posts')
-        //     ->whereNotBetween('id', [1, 100])
-        //     ->get();
-        
-        // $posts = DB::table('posts')
-        //     ->whereIn('category_id', [1, 2, 3])
-        //     ->get();
-        
-        // $posts = DB::table('posts')
-        //     ->whereNotIn('category_id', [1, 2, 3])
-        //     ->get();
-        
-        // $posts = DB::table('posts')
-        //     ->whereNull('updated_at')
-        //     ->get();
- 
-        // $posts = DB::table('posts')
-        //     ->whereNotNull('updated_at')
-        //     ->get();
- 
-        // $posts = DB::table('posts')
-        //     ->whereDate('created_at', '2018-05-17')
-        //     ->get();
- 
-        // $posts = DB::table('posts')
-        //     ->whereMonth('created_at', '05')
-        //     ->get();
- 
-        // $posts = DB::table('posts')
-        //     ->whereDay('created_at', '18')
-        //     ->get();
-            
-        // $posts = DB::table('posts')
-        //     ->whereYear('created_at', '2018')
-        //     ->get();
- 
-        // $posts = DB::table('posts')
-        //     ->whereColumn('updated_at', '>', 'created_at')
-        //     ->get();
-        
-        return view('blog.index', ['posts' => $posts]);
-    }
+   
 
     public function takeLatestPosts() {
         $posts = DB::table('posts')->orderBy('id', 'desc')->take(5)->get();
@@ -207,6 +143,82 @@ class PostController extends Controller
                 ->limit(5)
                 ->get();
         return view('blog.index', ['posts' => $posts]);
+    }
+
+    public function list()
+    {
+        $posts = Post::latest()->where('user_id', \Auth::id())->paginate(5);
+        // $this->authorize('view', $post);
+        return view('profile.list',compact('posts'));
+    }
+
+    public function edit(Post $post)
+    {
+        if (Gate::allows('update-post', $post)) {
+        echo 'Allowed Edit Post';
+        } else {
+        echo 'Not Allowed Edit Post ';
+        }
+        exit;
+    }
+
+
+    public function view(Post $post)
+    {
+        $user = \Auth::user();
+        if ($this->authorize('view', $post)) {
+        echo "Current logged in user is allowed to update the Post: {$post->title}";
+        } else {
+        echo 'Not Authorized.';
+        }
+
+        // if ($user->can('view', $post)) {
+        //   echo "Current logged in user is allowed to update the Post: {$post->title}";
+        // } else {
+        //   echo 'Not Authorized.';
+        // }
+    }
+  
+    public function create()
+    {
+        $user = \Auth::user();
+        if ($user->can('create', Post::class)) {
+            echo 'Current user now can create new posts!.';
+        } else {
+            echo 'You can not create post';
+        }
+
+        // if ($this->authorize('create', Post::class)) {
+        //     echo 'Current logged in user is allowed to create new posts.';
+        // } else {
+        //     echo 'You can not create post';
+        // }
+        // exit;
+    }
+
+    public function update(PostUpdateFormRequest $request, Post $post)
+    {
+        echo "Current logged in user is allowed to update the Post: {$post->title}";
+        // get current logged in user
+        // $user = \Auth::user();
+        // if ($user->can('update', $post)) {
+        //     echo "Current logged in user is allowed to update the Post: {$post->id}";
+        // } else {
+        //     echo 'Not Authorized.';
+        // }
+    }
+    
+    public function delete()
+    {
+        // get current logged in user
+        $user = Auth::user();
+        // load post
+        $post = Post::find(1);
+        if ($user->can('delete', $post)) {
+        echo "Current logged in user is allowed to delete the Post: {$post->id}";
+        } else {
+        echo 'Not Authorized.';
+        }
     }
     
 }

@@ -2,115 +2,77 @@
 
 @section('content')
 
-<div class="container-fluid">
-  <div class="animated fadeIn">
-      
-      @if (Session::get('message') != Null)
-        <div class="row">
-            <div class="col-md-9">
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    {{ Session::get('message') }}
-                </div>
-            </div>
-        </div>
-      @endif
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+    <h1 class="h2">Edit User</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+      <div class="btn-group mr-2">
+        <a href="{{ route('users.index') }}" title="All users">
+            <button class="btn btn-sm btn-outline-success"><span data-feather="arrow-left"></span>
+                Go Back</button>
+        </a>
+        <button class="btn btn-sm btn-outline-secondary">Export</button>
+      </div>
 
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header">
-            <strong>Edit</strong> Post
-              <a href="{{ route('posts.index') }}" class="btn btn-success btn-sm" title="All Posts">
-                  <i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back
-              </a>
-          </div>
-          
-          <form action="{{ route('posts.update',['id' => $post->id]) }}" method="post" enctype="multipart/form-data" class="form-horizontal">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="_method" value="PUT">
-            <div class="card-body">
-              
+      <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
+        <span data-feather="calendar"></span>
+        This week
+      </button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <form action="{{ route('users.update',['id' => $user->id]) }}" method="post" enctype="multipart/form-data" class="form-horizontal">
+      @csrf @method("PUT")
+      <div class="card-body">
               <div class="form-group row">
-                <label class="col-md-3 col-form-label" for="title">Post Title</label>
-                <div class="col-md-9">
-                  <input type="text" id="title" name="title" class="form-control" value="{{ $post->title }}">
-                  <span class="help-block">Enter Post Title</span>
+                <label class="col-2 col-form-label" for="title">User Name:</label>
+                <div class="col-10">
+                  <input type="text" id="name" name="name" class="form-control" value="{{ $user->name }}">
+                  <span class="help-block">Enter User Name</span>
                 </div>
               </div>
-              <div class="form-group row">
-                <label class="col-md-3 col-form-label" for="disabled-input">Post Slug</label>
-                <div class="col-md-9">
-                  <input type="text" id="disabled-input" name="disabled-input" class="form-control" value="{{ $post->slug }}" disabled="">
-                </div>
-              </div>
-              <div class="form-group row">
-                <label class="col-md-3 col-form-label" for="content">Post Content</label>
-                <div class="col-md-9">
-                  <textarea id="content" name="content" rows="9" class="form-control">{{ $post->content }}</textarea>
-                </div>
-              </div>
-              <div class="form-group row">
-                <label class="col-md-3 col-form-label" for="category_id">Post Category</label>
-                <div class="col-md-9">
-                  <select id="category_id" name="category_id" class="form-control">
-                    @foreach ($categories as $key => $value)
-                        <option value="{{ $key }}"
-                            @if ($key == old('category_id', $post->category_id))
-                            selected="selected"
-                            @endif
-                            >{{ $value }}
+              <div class="form-group">
+                <label for="selectall-role" class= 'control-label'>Select roles</label>
+                <button type="button" class="btn btn-primary btn-xs" id="selectbtn-role">
+                    Select all
+                </button>
+                <button type="button" class="btn btn-primary btn-xs" id="deselectbtn-role">
+                    Deselect all
+                </button>
+                <select name="role[]" class="form-control select2" multiple='multiple' id='selectall-role'>
+                    @foreach($roles as $key => $value)
+                        <option value="{{ $key }}" @if($user->roles)
+                        {{ ($user->roles->pluck('id')->contains($key)) ? 'selected':'' }}
+                        @endif  />
+                          {{ $value }}
                         </option>
                     @endforeach
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <label class="col-md-3 col-form-label">Is Active</label>
-                <div class="col-md-9">
-                  <label class="radio-inline" for="inline-radio1">
-                    <input type="radio" id="inline-radio1" name="is_active" value="1" @if (old('is_active', $post->is_active)) checked="checked" @endif> Yes
-                  </label>
-                  <label class="radio-inline" for="inline-radio2">
-                    <input type="radio" id="inline-radio2" name="is_active" value="0"> No
-                  </label>
-                </div>
-              </div>
-              <div class="form-group row">
-                <label class="col-md-3 col-form-label" for="tags">Post Tags</label>
-                <div class="col-md-9">
-                  <select name="tags[]" id="tags" class="form-control state-tags-multiple" multiple="multiple">
-
-                    @foreach($tags as $key => $value)
-                      <option value="{{ $key }}" 
-                       {{ (collect(old('tags'))->contains($key)) ? 'selected':'' }}>
-                       {{ $value }}
-                      </option>
-                    @endforeach
-                  </select>
-                </div>
+                </select>
               </div>
             </div>
             <div class="card-footer">
               <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-dot-circle-o"></i> Submit</button>
               <button type="reset" class="btn btn-sm btn-danger"><i class="fa fa-ban"></i> Reset</button>
-            </div>
-          </form>
-        </div>
       </div>
-    </div>
+    </form>
   </div>
-</div>
+
 @endsection
+
 @section('scripts')
-<script>
-        $('').select2({
-            placeholder: 'Choose A Tag',
-            tags: true 
+    @parent
+    <script>
+        $("#selectbtn-role").click(function(){
+            $("#selectall-role > option").prop("selected","selected");
+            $("#selectall-role").trigger("change");
         });
-        $('#tags').select2().val({!! json_encode($post->tags()->allRelatedIds()->toArray()) !!}).trigger('change');
-</script>
+        $("#deselectbtn-role").click(function(){
+            $("#selectall-role > option").prop("selected","");
+            $("#selectall-role").trigger("change");
+        });
+
+        $(document).ready(function () {
+            $('.select2').select2();
+        });
+    </script>
 @endsection

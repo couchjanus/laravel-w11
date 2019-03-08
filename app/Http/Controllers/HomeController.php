@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+use Gate;
 
 class HomeController extends Controller
 {
@@ -28,8 +29,13 @@ class HomeController extends Controller
         // dump(session('message'));
         
         // dump($request->flash('message'));
-        
+
+        if (Gate::allows('is-admin')) {
+            return view('admin.index')->with('title', 'Dashboard Page');
+        }
         return view('home');
+        
+        // return view('home');
     }
 
 

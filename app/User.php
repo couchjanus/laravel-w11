@@ -9,10 +9,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Hash;
 
+use App\Traits\HasRoles;
+
 class User extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable;
     use SoftDeletes;
+    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -74,4 +77,15 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany('App\Social');
     }
 
+    /**
+     * Checks a Permission
+     */
+    public function isSuperVisor()
+    {
+        if ($this->roles->contains('slug', 'super-visor')) {
+            return true;
+        }
+        return false;
+    }
+    
 }
