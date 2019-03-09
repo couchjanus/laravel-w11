@@ -12,16 +12,33 @@ class TestController extends Controller
         
     public function index()
     {
-        // $permissions = \App\Permission::all();
-        // dump($permissions);
+        $post = \App\Post::find(1);
 
-        // $user = User::where('id', 1)->with('roles')->firstOrFail();
+        foreach ($post->comments as $comment) {
+          dump($comment->body);
+        }
+
+        $comment = \App\Comment::find(1);
+
+        $commentable = $comment->commentable;
+
+        // dump($commentable);
         
-        $user = \Auth::user();
-        dump($user->roles);
-        
-        dump($user->can('can-list'));
-      
-            
+        // Получить все статьи в блоге, имеющие хотя бы один комментарий...
+        $posts = \App\Post::has('comments')->get();
+        dump($posts);
+        // Вы также можете указать оператор и число:
+        // Получить все статьи в блоге, имеющие три и более комментариев...
+        $posts = \App\Post::has('comments', '>=', 10)->get();
+        dump($posts);
+
+        $posts = \App\Post::whereDoesntHave('comments')->get();
+        dump($posts);
+
+        $posts = \App\Post::withCount('comments')->get();
+
+        foreach ($posts as $post) {
+            echo $post->comments_count;
+        }
     }
 }

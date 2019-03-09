@@ -24,7 +24,7 @@ Route::get('test', 'TestController@index');
 
 Route::prefix('blog')->group(function () {
     Route::get('', 'PostController@index')->name('blog.index');
-    Route::get('{post}','PostController@showFromCache')->name('blog.show'); 
+    Route::get('{post}','PostController@show')->name('blog.show'); 
     Route::get('category/{id}', 'PostController@getPostsByCategory')->name('blog.category');
 });
 
@@ -83,3 +83,7 @@ Route::get('/feedbacks/delete/{id}', 'Admin\FeedbackController@destroy');
    
 // Route::get('social/{provider}', 'Auth\SocialController@redirect')->name('social.redirect');
 // Route::get('social/{provider}/callback', 'Auth\SocialController@callback')->name('social.callback');
+
+Route::get('vue', function () {
+      return view('vue');
+});

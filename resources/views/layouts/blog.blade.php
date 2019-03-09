@@ -4,11 +4,6 @@
    Blog Post Title
 @endsection
 
-@section('styles')
-    <!-- Custom styles for this template -->
-    
-@endsection
-
 @section('navigation')
     @include('layouts.partials.frontend._navigation')
 @endsection
@@ -34,6 +29,3 @@
 @endsection
 
 {{--Scripts--}}
-@section('scripts')
-   
-@endsection

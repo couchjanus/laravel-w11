@@ -9,4 +9,5 @@
 
 <span data-feather="tag"></span> {{ $post->visited }}
 
+
 <a href="{{ route('blog.category', $post->category_id) }}"><span data-feather="list"></span> {{ $post->category->name }}</a>

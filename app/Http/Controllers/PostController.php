@@ -21,7 +21,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::where('status', StatusType::Published)->orderBy('updated_at', 'desc')->simplePaginate(5);
+        $posts = Post::withCount('comments')->where('status', StatusType::Published)->orderBy('updated_at', 'desc')->simplePaginate(5);
         return view('blog.index', ['posts' => $posts, 'title'=>'Awesome Blog']);
     }
 
@@ -49,7 +49,9 @@ class PostController extends Controller
 
     public function show(Post $post)
     {
-        return view('blog.show', ['post' => $post, 'hescomment'=>false]);
+        $hescomment = Post::has('comments')?true:false;
+        // dd($hescomment);
+        return view('blog.show', ['post' => $post, 'hescomment'=>$hescomment]);
     }
 
     public function showFromCache($slug)

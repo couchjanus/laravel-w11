@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Cviebrock\EloquentSluggable\Sluggable;
 
-// use App\Enums\StatusType;
 use App\Scopes\TitleScope;
-
+use App\Traits\HasComments;
 
 class Post extends Model
 {
     use Sluggable;
+    use HasComments;
     
     protected $perPage = 10; 
 
@@ -94,6 +94,14 @@ class Post extends Model
     {
         return $this->belongsToMany(Tag::class);
     }
+
+    /**
+     * Get all of the post's comments.
+     */
+    // public function comments()
+    // {
+    //     return $this->morphMany(Comment::class, 'commentable');
+    // }
 
  
 }
