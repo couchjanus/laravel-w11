@@ -23,6 +23,7 @@
     <h4>Comments</h4>
     <ul class="list-group list-group-flush">
       <li class="list-group-item" v-for="comment in comments">
+        <h3>{{comment.creator.name}} </h3>  <time>{{comment.created_at}}</time>
         <div class="media-body">{{comment.body}}</div>
       </li>
     </ul>
@@ -54,6 +55,7 @@ export default {
         .get("../api/post/" + this.currentId + "/comments")
         .then(response => {
           this.comments = response.data;
+          console.log(this.comments);
         })
         .catch(error => {
           this.errors.push(error);

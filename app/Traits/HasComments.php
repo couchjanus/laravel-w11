@@ -21,7 +21,7 @@ trait HasComments
      */
     public function comments(): MorphMany
     {
-        return $this->morphMany($this->commentableModel(), 'commentable');
+        return $this->morphMany($this->commentableModel(), 'commentable')->with('creator');
     }
 
     /**

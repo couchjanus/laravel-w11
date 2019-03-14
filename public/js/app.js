@@ -1797,13 +1797,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['currentId', 'currentUser'],
+  props: ["currentId", "currentUser"],
   data: function data() {
     return {
       comments: [],
       comment: {
-        body: ''
+        body: ""
       },
       errors: []
     };
@@ -1817,6 +1818,7 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get("../api/post/" + this.currentId + "/comments").then(function (response) {
         _this.comments = response.data;
+        console.log(_this.comments);
       }).catch(function (error) {
         _this.errors.push(error);
       });
@@ -1825,11 +1827,11 @@ __webpack_require__.r(__webpack_exports__);
       var _this2 = this;
 
       axios.post("../api/post/" + this.currentId + "/comment", this.comment).then(function (response) {
-        _this2.comment.body = '';
+        _this2.comment.body = "";
 
         _this2.fetchComments();
       }).catch(function (error) {
-        _this2.comment.body = '';
+        _this2.comment.body = "";
 
         _this2.fetchComments();
       });
@@ -36940,8 +36942,12 @@ var render = function() {
       { staticClass: "list-group list-group-flush" },
       _vm._l(_vm.comments, function(comment) {
         return _c("li", { staticClass: "list-group-item" }, [
+          _c("h3", [_vm._v(_vm._s(comment.creator.name) + " ")]),
+          _vm._v(" "),
+          _c("time", [_vm._v(_vm._s(comment.created_at))]),
+          _vm._v(" "),
           _c("div", { staticClass: "media-body" }, [
-            _vm._v("\n            " + _vm._s(comment.body) + "\n          ")
+            _vm._v(_vm._s(comment.body))
           ])
         ])
       }),
@@ -36952,9 +36958,7 @@ var render = function() {
       ? _c(
           "ul",
           _vm._l(_vm.errors, function(error) {
-            return _c("li", [
-              _vm._v("\n          " + _vm._s(error.message) + "\n        ")
-            ])
+            return _c("li", [_vm._v(_vm._s(error.message))])
           }),
           0
         )
