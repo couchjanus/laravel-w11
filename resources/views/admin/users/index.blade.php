@@ -12,22 +12,15 @@
           </a>
         </div>
         
-        <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
-          <span data-feather="calendar"></span>
-          This week
-        </button>
+        <form class="form-inline mr-2" action="/admin/users/search" method="POST" role="search">@csrf
+          <input class="form-control mr-2" type="text" placeholder="Search users" aria-label="Search" name="q">
+          <button class="btn btn-sm btn-outline-success mr-2" type="submit"><span data-feather="search"></span> Search</button>
+        </form>
       </div>
   </div>
     
   <div class="table-responsive">
-    @if ($message = Session::get('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <span class="badge badge-pill badge-success">Success</span> {!! $message !!}
-        </div>
-    @endif
+    
     <table class="table table-hover">
       @if($users->count() === 0)
         <div class="well text-center">No users found.</div>

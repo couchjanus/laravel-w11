@@ -1,7 +1,14 @@
 <aside class="col-md-4 blog-sidebar">
         <div class="p-3 mb-3 bg-light rounded">
-            <h4 class="font-italic">About</h4>
-            <p class="mb-0">Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+            <h4 class="font-italic">Search</h4>
+            <form action="{{ url('/search') }}" method="get">
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="Search for..." name="q" value="{{ request('q') }}">
+                  <span class="input-group-btn">
+                    <button class="btn btn-secondary" type="submit">Go!</button>
+                  </span>
+                </div>
+           </form>
         </div>
 
         <div class="p-3">

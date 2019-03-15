@@ -9,11 +9,13 @@ use Cviebrock\EloquentSluggable\Sluggable;
 
 use App\Scopes\TitleScope;
 use App\Traits\HasComments;
+use Laravel\Scout\Searchable;
 
 class Post extends Model
 {
     use Sluggable;
     use HasComments;
+    use Searchable;
     
     protected $perPage = 10; 
 

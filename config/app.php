@@ -178,6 +178,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         
         App\Providers\WidgetServiceProvider::class,
+        App\Providers\ArticleServiceProvider::class,
+        App\Providers\ElasticsearchServiceProvider::class,
         
     ],
 

@@ -1,6 +1,8 @@
 <?php
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Http\Request;
+use App\User;
+use Illuminate\Support\Facades\Input;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,6 +23,9 @@ Route::get('contact-us', 'ContactController@index')->name('contact');
 
 
 Route::get('test', 'TestController@index');
+
+Route::get('articles', 'ArticleController@index')->name('articles.index');
+Route::get('articles/{id}','ArticleController@show')->name('articles.show'); 
 
 Route::prefix('blog')->group(function () {
     Route::get('', 'PostController@index')->name('blog.index');
@@ -43,7 +48,16 @@ Route::prefix('admin')->group(function () {
     Route::resource('users', 'Admin\UserController');
     Route::resource('tags', 'Admin\TagController');
     Route::resource('categories', 'Admin\CategoryController');
-    
+
+    Route::any('users/search',function(){
+      $q = Input::get ( 'q' );
+      $users = User::where('name','LIKE','%'.$q.'%')->orWhere('email','LIKE','%'.$q.'%')->paginate();
+      if(count($users) > 0) {
+          return view('admin.users.index')->withUsers($users)->withQuery($q);
+      } else {
+            return redirect(route('users.index'))->withType('warning')->withMessage('No Details found. Try to search again !');
+      }
+    });
 });
 
 Auth::routes(['verify' => true]);
@@ -84,6 +98,15 @@ Route::get('/feedbacks/delete/{id}', 'Admin\FeedbackController@destroy');
 // Route::get('social/{provider}', 'Auth\SocialController@redirect')->name('social.redirect');
 // Route::get('social/{provider}/callback', 'Auth\SocialController@callback')->name('social.callback');
 
-Route::get('vue', function () {
-      return view('vue');
+use \App\Repositories\ElasticsearchArticleRepositoryInterface;
+
+Route::get('/search', function (ElasticsearchArticleRepositoryInterface $repository) {
+   
+   $articles = $repository->search((string) request('q'));
+
+//    dump($articles);
+   return view('articles.index', [
+       'posts' => $articles,
+       'title' => 'Awesome Blog'
+   ]);
 });
